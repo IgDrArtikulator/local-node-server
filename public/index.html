@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Servidor local com Express</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+    section { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+    input, textarea, button { display: block; width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; font: inherit; box-sizing: border-box; }
+    button { cursor: pointer; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+    .card { border: 1px solid #ccc; border-radius: 8px; padding: 0.75rem; text-align: center; }
+    .card .emoji { font-size: 1.8rem; }
+    .resultado { font-weight: bold; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>Servidor local com Express</h1>
+
+  <!-- Exemplo 1: requisição GET -->
+  <section>
+    <h2>1. GET /api/frase</h2>
+    <button id="btn-frase">Pedir uma frase ao servidor</button>
+    <p class="resultado" id="resultado-frase"></p>
+  </section>
+
+  <!-- Exemplo 2: requisição POST (formulário) -->
+  <section>
+    <h2>2. POST /api/mensagem</h2>
+    <form id="form-mensagem">
+      <input type="text" id="nome" placeholder="Seu nome" />
+      <textarea id="mensagem" placeholder="Sua mensagem"></textarea>
+      <button type="submit">Enviar ao servidor</button>
+    </form>
+    <p class="resultado" id="resultado-mensagem"></p>
+  </section>
+
+  <!-- Exemplo 3: GET que devolve uma lista -->
+  <section>
+    <h2>3. GET /api/tecnologias</h2>
+    <button id="btn-tecnologias">Carregar lista de tecnologias</button>
+    <div class="cards" id="lista-tecnologias"></div>
+  </section>
+
+  <script>
+    // GET: só pede dados ao servidor
+    document.getElementById("btn-frase").addEventListener("click", async () => {
+      const resposta = await fetch("/api/frase");
+      const dados = await resposta.json();
+      document.getElementById("resultado-frase").textContent = dados.frase;
+    });
+
+    // POST: envia dados ao servidor (no corpo da requisição)
+    document.getElementById("form-mensagem").addEventListener("submit", async (evento) => {
+      evento.preventDefault(); // evita recarregar a página
+
+      const resposta = await fetch("/api/mensagem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: document.getElementById("nome").value,
+          mensagem: document.getElementById("mensagem").value,
+        }),
+      });
+
+      const dados = await resposta.json();
+      document.getElementById("resultado-mensagem").textContent = dados.resposta || dados.erro;
+    });
+
+    // GET com lista: o servidor devolve um array e o front cria um card para cada item
+    document.getElementById("btn-tecnologias").addEventListener("click", async () => {
+      const resposta = await fetch("/api/tecnologias");
+      const tecnologias = await resposta.json();
+
+      const container = document.getElementById("lista-tecnologias");
+      container.innerHTML = "";
+
+      tecnologias.forEach((tec) => {
+        container.innerHTML += `
+          <div class="card">
+            <div class="emoji">${tec.emoji}</div>
+            <strong>${tec.nome}</strong>
+            <p>${tec.descricao}</p>
+          </div>`;
+      });
+    });
+  </script>
+</body>
+</html>

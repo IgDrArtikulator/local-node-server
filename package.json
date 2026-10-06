@@ -1,0 +1,12 @@
+{
+  "name": "servidor-local-exemplo",
+  "version": "1.0.0",
+  "description": "Exemplo mínimo de servidor local com Node e Express para aulas de front-end",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
